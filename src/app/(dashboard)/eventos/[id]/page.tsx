@@ -1,0 +1,62 @@
+import { createClient } from "@/lib/supabase-server";
+import { redirect, notFound } from "next/navigation";
+import { EventDetailClient } from "./event-detail-client";
+
+export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+  if (!profile) redirect("/login");
+
+  const { data: event } = await supabase.from("events").select("*").eq("id", id).single();
+  if (!event) notFound();
+
+  // Check access for managers
+  if (profile.role === "manager") {
+    const { data: access } = await supabase
+      .from("event_users")
+      .select("id")
+      .eq("event_id", id)
+      .eq("user_id", user.id)
+      .single();
+    if (!access) redirect("/eventos");
+  }
+
+  const [{ data: transactions }, { data: categories }, { data: responsiblePersons }, { data: suppliers }] =
+    await Promise.all([
+      supabase
+        .from("transactions")
+        .select("*, category:categories(*), responsible_person:responsible_persons(*)")
+        .eq("event_id", id)
+        .order("date", { ascending: false }),
+      supabase.from("categories").select("*").eq("event_id", id).order("name"),
+      supabase.from("responsible_persons").select("*").eq("event_id", id).order("name"),
+      supabase.from("suppliers").select("*").order("name"),
+    ]);
+
+  // Event users (for admin to manage)
+  const { data: eventUsers } = await supabase
+    .from("event_users")
+    .select("*, profile:profiles(*)")
+    .eq("event_id", id);
+
+  const { data: allProfiles } = profile.role === "admin"
+    ? await supabase.from("profiles").select("*").order("full_name")
+    : { data: null };
+
+  return (
+    <EventDetailClient
+      profile={profile}
+      event={event}
+      transactions={transactions ?? []}
+      categories={categories ?? []}
+      responsiblePersons={responsiblePersons ?? []}
+      suppliers={suppliers ?? []}
+      eventUsers={eventUsers ?? []}
+      allProfiles={allProfiles ?? []}
+    />
+  );
+}
