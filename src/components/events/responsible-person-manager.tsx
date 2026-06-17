@@ -192,7 +192,7 @@ export function ResponsiblePersonManager({
             {allProfiles.length > 0 && (
               <div className="space-y-1.5">
                 <Label>Selecionar usuário do sistema</Label>
-                <Select value={selectedProfileId} onValueChange={handleSelectProfile}>
+                <Select value={selectedProfileId} onValueChange={(v) => v && handleSelectProfile(v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Escolher usuário..." />
                   </SelectTrigger>
