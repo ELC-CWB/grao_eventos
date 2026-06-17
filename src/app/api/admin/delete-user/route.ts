@@ -18,10 +18,16 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Não é possível excluir sua própria conta" }, { status: 400 });
   }
 
-  const adminClient = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey) {
+    return NextResponse.json(
+      { error: "Variável SUPABASE_SERVICE_ROLE_KEY não configurada no servidor. Adicione-a nas variáveis de ambiente do Vercel." },
+      { status: 500 }
+    );
+  }
+
+  const adminClient = createAdminClient(supabaseUrl, serviceKey);
 
   const { error } = await adminClient.auth.admin.deleteUser(userId);
   if (error) {

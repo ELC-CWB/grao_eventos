@@ -12,18 +12,19 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
   if (!profile) redirect("/login");
 
+  // Usa admin client se disponível (bypassa RLS), caso contrário usa cliente autenticado normal
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceKey) notFound();
+  const dbClient = (supabaseUrl && serviceKey)
+    ? createAdminClient(supabaseUrl, serviceKey)
+    : supabase;
 
-  const admin = createAdminClient(supabaseUrl, serviceKey);
-
-  const { data: event } = await admin.from("events").select("*").eq("id", id).single();
+  const { data: event } = await dbClient.from("events").select("*").eq("id", id).single();
   if (!event) notFound();
 
-  // Check access for managers using admin client (reliable, bypasses RLS)
+  // Verifica acesso para gerentes
   if (profile.role === "manager") {
-    const { data: access } = await admin
+    const { data: access } = await dbClient
       .from("event_users")
       .select("id")
       .eq("event_id", id)

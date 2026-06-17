@@ -387,7 +387,12 @@ export function UsersClient({ currentProfile, profiles: initialProfiles, events,
                 <button
                   type="button"
                   className="text-xs text-destructive hover:underline"
-                  onClick={() => { setShowForm(false); setDeletingId(editingProfile.id); }}
+                  onClick={() => {
+                    const idToDelete = editingProfile.id;
+                    setShowForm(false);
+                    setEditingProfile(null);
+                    setTimeout(() => setDeletingId(idToDelete), 150);
+                  }}
                 >
                   Excluir usuário
                 </button>

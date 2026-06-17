@@ -206,29 +206,27 @@ export function EventsClient({ profile, events: initialEvents }: EventsClientPro
                           </div>
                         )}
 
-                        <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                          {profile.role === "admin" && (
-                            <>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => { setEditingEvent(ev); setShowForm(true); }}
-                              >
-                                <Edit size={14} />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
-                                onClick={() => setDeletingId(ev.id)}
-                              >
-                                <Trash2 size={14} />
-                              </Button>
-                            </>
-                          )}
-                          <ChevronRight size={16} className="text-muted-foreground" />
-                        </div>
+                        {profile.role === "admin" && (
+                          <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => { setEditingEvent(ev); setShowForm(true); }}
+                            >
+                              <Edit size={14} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                              onClick={() => setDeletingId(ev.id)}
+                            >
+                              <Trash2 size={14} />
+                            </Button>
+                          </div>
+                        )}
+                        <ChevronRight size={16} className="text-muted-foreground flex-shrink-0" />
                       </div>
                     );
                   })}

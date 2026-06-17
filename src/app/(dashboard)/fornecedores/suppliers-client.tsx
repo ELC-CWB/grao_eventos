@@ -208,92 +208,91 @@ function openCreate() {
           </CardContent>
         </Card>
       ) : (
-        <div className="rounded-2xl border overflow-hidden max-w-full">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[560px] text-sm">
-              <thead>
-                <tr className="border-b" style={{ background: "rgba(243,112,34,0.06)" }}>
-                  {/* Nome */}
-                  <th className="px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                    <Select value={filterName} onValueChange={(v) => v && setFilterName(v)}>
-                      <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
-                        <SelectValue>{filterName === "__all__" ? "Nome" : filterName}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__all__">Todos</SelectItem>
-                        {uniqueNames.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </th>
-                  {/* Contato */}
-                  <th className="px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                    <Select value={filterContact} onValueChange={(v) => v && setFilterContact(v)}>
-                      <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
-                        <SelectValue>{filterContact === "__all__" ? "Contato" : filterContact}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__all__">Todos</SelectItem>
-                        {uniqueContacts.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </th>
-                  {/* Telefone */}
-                  <th className="px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                    <Select value={filterPhone} onValueChange={(v) => v && setFilterPhone(v)}>
-                      <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
-                        <SelectValue>{filterPhone === "__all__" ? "Telefone" : filterPhone}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__all__">Todos</SelectItem>
-                        {uniquePhones.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </th>
-                  {/* Item Fornecido */}
-                  <th className="px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                    <Select value={filterItem} onValueChange={(v) => v && setFilterItem(v)}>
-                      <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
-                        <SelectValue>{filterItem === "__all__" ? "Item Fornecido" : filterItem}</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__all__">Todos</SelectItem>
-                        {uniqueItems.map((i) => <SelectItem key={i} value={i}>{i}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </th>
-                  <th className="px-4 py-2.5 w-28" />
+        <div className="rounded-2xl border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b" style={{ background: "rgba(243,112,34,0.06)" }}>
+                {/* Nome — sempre visível */}
+                <th className="px-3 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+                  <Select value={filterName} onValueChange={(v) => v && setFilterName(v)}>
+                    <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
+                      <SelectValue>{filterName === "__all__" ? "Nome" : filterName}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">Todos</SelectItem>
+                      {uniqueNames.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </th>
+                {/* Contato — sempre visível */}
+                <th className="px-3 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+                  <Select value={filterContact} onValueChange={(v) => v && setFilterContact(v)}>
+                    <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
+                      <SelectValue>{filterContact === "__all__" ? "Contato" : filterContact}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">Todos</SelectItem>
+                      {uniqueContacts.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </th>
+                {/* Telefone — sempre visível */}
+                <th className="px-3 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+                  <Select value={filterPhone} onValueChange={(v) => v && setFilterPhone(v)}>
+                    <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
+                      <SelectValue>{filterPhone === "__all__" ? "Telefone" : filterPhone}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">Todos</SelectItem>
+                      {uniquePhones.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </th>
+                {/* Item Fornecido — oculto no mobile */}
+                <th className="hidden sm:table-cell px-3 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+                  <Select value={filterItem} onValueChange={(v) => v && setFilterItem(v)}>
+                    <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
+                      <SelectValue>{filterItem === "__all__" ? "Item Fornecido" : filterItem}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">Todos</SelectItem>
+                      {uniqueItems.map((i) => <SelectItem key={i} value={i}>{i}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </th>
+                {/* Ações — ocultas no mobile */}
+                <th className="hidden sm:table-cell px-3 py-2.5 w-24" />
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground text-sm">
+                    Nenhum fornecedor encontrado com os filtros selecionados.
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-4 py-10 text-center text-muted-foreground text-sm">
-                      Nenhum fornecedor encontrado com os filtros selecionados.
-                    </td>
-                  </tr>
-                ) : filtered.map((s) => (
-                  <tr key={s.id} className="group border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => openEdit(s)}>
-                    <td className="px-4 py-1.5 font-semibold">{s.name}</td>
-                    <td className="px-4 py-1.5 text-muted-foreground">{s.contact_name ?? "—"}</td>
-                    <td className="px-4 py-1.5 text-muted-foreground">{s.phone ?? "—"}</td>
-                    <td className="px-4 py-1.5 text-muted-foreground">{s.item_supplied ?? "—"}</td>
-                    <td className="px-4 py-1.5" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="icon" className="w-7 h-7" onClick={() => openEdit(s)}>
-                          <Edit size={12} />
+              ) : filtered.map((s) => (
+                <tr key={s.id} className="group border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => openEdit(s)}>
+                  <td className="px-3 py-2 font-semibold">{s.name}</td>
+                  <td className="px-3 py-2 text-muted-foreground text-sm">{s.contact_name ?? "—"}</td>
+                  <td className="px-3 py-2 text-muted-foreground text-sm">{s.phone ?? "—"}</td>
+                  <td className="hidden sm:table-cell px-3 py-2 text-muted-foreground text-sm">{s.item_supplied ?? "—"}</td>
+                  <td className="hidden sm:table-cell px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" className="w-7 h-7" onClick={() => openEdit(s)}>
+                        <Edit size={12} />
+                      </Button>
+                      {profile.role === "admin" && (
+                        <Button variant="ghost" size="icon" className="w-7 h-7 text-destructive hover:text-destructive" onClick={() => setDeletingId(s.id)}>
+                          <Trash2 size={12} />
                         </Button>
-                        {profile.role === "admin" && (
-                          <Button variant="ghost" size="icon" className="w-7 h-7 text-destructive hover:text-destructive" onClick={() => setDeletingId(s.id)}>
-                            <Trash2 size={12} />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
