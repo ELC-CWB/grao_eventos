@@ -236,7 +236,7 @@ export function DashboardClient({ profile, events, summaries }: DashboardClientP
               </div>
               <span className="text-[10px] text-muted-foreground font-medium">Receitas</span>
             </div>
-            <p className="text-lg font-black text-emerald-600">{formatCurrency(totals.revenue)}</p>
+            <p className="text-sm lg:text-lg font-black text-emerald-600 leading-tight">{formatCurrency(totals.revenue)}</p>
             <p className="text-[11px] text-muted-foreground font-medium">Total recebido</p>
           </CardContent>
         </Card>
@@ -250,7 +250,7 @@ export function DashboardClient({ profile, events, summaries }: DashboardClientP
               </div>
               <span className="text-[10px] text-muted-foreground font-medium">Despesas</span>
             </div>
-            <p className="text-lg font-black text-red-500">{formatCurrency(totals.expense)}</p>
+            <p className="text-sm lg:text-lg font-black text-red-500 leading-tight">{formatCurrency(totals.expense)}</p>
             <p className="text-[11px] text-muted-foreground font-medium">Total gasto</p>
           </CardContent>
         </Card>
@@ -264,7 +264,7 @@ export function DashboardClient({ profile, events, summaries }: DashboardClientP
               </div>
               <span className="text-[10px] text-muted-foreground font-medium">Resultado</span>
             </div>
-            <p className={cn("text-lg font-black", totalProfit >= 0 ? "text-emerald-600" : "text-red-500")}>
+            <p className={cn("text-sm lg:text-lg font-black leading-tight", totalProfit >= 0 ? "text-emerald-600" : "text-red-500")}>
               {formatCurrency(totalProfit)}
             </p>
             <p className="text-[11px] text-muted-foreground font-medium">Lucro / Prejuízo</p>

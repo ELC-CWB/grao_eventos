@@ -357,40 +357,40 @@ export function EventDetailClient({
         </div>
       </div>
 
-      {/* Summary cards + Gráfico button */}
-      <div className="flex gap-2 items-stretch">
-        <Card className="flex-1 min-w-0">
+      {/* Summary cards + Gráfico button — 2×2 no mobile, linha no sm+ */}
+      <div className="grid grid-cols-2 sm:flex sm:items-stretch gap-2">
+        <Card className="sm:flex-1 min-w-0">
           <CardContent className="px-3 py-2">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 mb-1">
               <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: "rgba(16,185,129,0.12)" }}>
                 <TrendingUp size={11} className="text-emerald-500" />
               </div>
-              <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">Receitas</span>
+              <span className="text-[10px] text-muted-foreground font-semibold uppercase">Receitas</span>
             </div>
-            <p className="text-base font-black text-emerald-600 mt-1">{formatCurrency(summary.revenue)}</p>
+            <p className="text-sm font-black text-emerald-600 leading-tight">{formatCurrency(summary.revenue)}</p>
           </CardContent>
         </Card>
-        <Card className="flex-1 min-w-0">
+        <Card className="sm:flex-1 min-w-0">
           <CardContent className="px-3 py-2">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 mb-1">
               <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0" style={{ background: "rgba(239,68,68,0.12)" }}>
                 <TrendingDown size={11} className="text-red-500" />
               </div>
-              <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">Despesas</span>
+              <span className="text-[10px] text-muted-foreground font-semibold uppercase">Despesas</span>
             </div>
-            <p className="text-base font-black text-red-500 mt-1">{formatCurrency(summary.expense)}</p>
+            <p className="text-sm font-black text-red-500 leading-tight">{formatCurrency(summary.expense)}</p>
           </CardContent>
         </Card>
-        <Card className="flex-1 min-w-0">
+        <Card className="sm:flex-1 min-w-0">
           <CardContent className="px-3 py-2">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 mb-1">
               <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
                 style={{ background: summary.profit >= 0 ? "rgba(16,185,129,0.12)" : "rgba(239,68,68,0.12)" }}>
                 <DollarSign size={11} className={summary.profit >= 0 ? "text-emerald-500" : "text-red-500"} />
               </div>
-              <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">Resultado</span>
+              <span className="text-[10px] text-muted-foreground font-semibold uppercase">Resultado</span>
             </div>
-            <p className={cn("text-base font-black mt-1", summary.profit >= 0 ? "text-emerald-600" : "text-red-500")}>
+            <p className={cn("text-sm font-black leading-tight", summary.profit >= 0 ? "text-emerald-600" : "text-red-500")}>
               {formatCurrency(summary.profit)}
             </p>
           </CardContent>
@@ -398,7 +398,7 @@ export function EventDetailClient({
         <button
           type="button"
           onClick={() => setShowChart(true)}
-          className="flex-shrink-0 flex flex-col items-center justify-center gap-1 px-2 w-16 rounded-xl border text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors leading-tight"
+          className="flex flex-col items-center justify-center gap-1 px-2 rounded-xl border text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors leading-tight sm:flex-shrink-0 sm:w-16"
         >
           <FileSpreadsheet size={13} />
           Gráfico Categoria
@@ -506,8 +506,9 @@ export function EventDetailClient({
                       </SelectContent>
                     </Select>
                   </th>
-                  <th className="text-right px-4 py-2.5 text-xs font-semibold text-emerald-600">Receita</th>
-                  <th className="text-right px-4 py-2.5 text-xs font-semibold text-red-500">Despesa</th>
+                  <th className="sm:hidden text-right px-2 py-1.5 text-[10px] font-semibold text-muted-foreground">Valor</th>
+                  <th className="hidden sm:table-cell text-right px-4 py-2.5 text-xs font-semibold text-emerald-600">Receita</th>
+                  <th className="hidden sm:table-cell text-right px-4 py-2.5 text-xs font-semibold text-red-500">Despesa</th>
                   <th className="w-16 text-right pr-2">
                     {hasFilters && (
                       <button onClick={clearFilters} className="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-0.5 ml-auto">
@@ -531,7 +532,7 @@ export function EventDetailClient({
                       key={tx.id}
                       className="group border-b last:border-0 hover:bg-muted/30 transition-colors"
                     >
-                      <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{formatDate(tx.date)}</td>
+                      <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs text-muted-foreground whitespace-nowrap">{formatDate(tx.date)}</td>
                       <td className="px-4 py-3 text-xs text-muted-foreground hidden lg:table-cell whitespace-nowrap">
                         {(tx.created_by_profile as { full_name?: string } | undefined)?.full_name ?? "—"}
                       </td>
@@ -548,11 +549,15 @@ export function EventDetailClient({
                       <td className="px-4 py-3 text-xs text-muted-foreground hidden md:table-cell whitespace-nowrap">
                         {(tx.supplier as { name?: string } | undefined)?.name ?? "—"}
                       </td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground max-w-[200px] truncate">{tx.description}</td>
-                      <td className="px-4 py-3 text-right font-black text-emerald-600 whitespace-nowrap">
+                      <td className="px-2 py-2 sm:px-4 sm:py-3 text-xs text-muted-foreground max-w-[110px] sm:max-w-[200px] truncate">{tx.description}</td>
+                      <td className="sm:hidden px-2 py-2 text-right text-[11px] font-bold whitespace-nowrap"
+                        style={{ color: tx.type === "revenue" ? "#10b981" : "#ef4444" }}>
+                        {formatCurrency(Number(tx.amount))}
+                      </td>
+                      <td className="hidden sm:table-cell px-4 py-3 text-right font-black text-emerald-600 whitespace-nowrap">
                         {tx.type === "revenue" ? formatCurrency(Number(tx.amount)) : ""}
                       </td>
-                      <td className="px-4 py-3 text-right font-black text-red-500 whitespace-nowrap">
+                      <td className="hidden sm:table-cell px-4 py-3 text-right font-black text-red-500 whitespace-nowrap">
                         {tx.type === "expense" ? formatCurrency(Number(tx.amount)) : ""}
                       </td>
                       <td className="px-2 py-3">
