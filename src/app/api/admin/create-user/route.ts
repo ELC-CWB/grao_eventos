@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   }
 
   const { email, password, full_name, phone } = await request.json();
-  const role = "manager"; // novos usuários sempre criados como Apoiador
+  const role = "manager" as const; // novos usuários sempre Apoiador — somente admin pode promover depois
 
   const adminClient = createAdminClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

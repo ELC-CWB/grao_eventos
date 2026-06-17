@@ -134,15 +134,25 @@ export function EventsClient({ profile, events: initialEvents }: EventsClientPro
               style={{ background: "rgba(243, 112, 34, 0.1)" }}>
               <CalendarRange size={28} style={{ color: "#f37022" }} />
             </div>
-            <p className="font-bold">Nenhum evento cadastrado</p>
-            {profile.role === "admin" && (
-              <Button
-                onClick={() => setShowForm(true)}
-                className="mt-4"
-                style={{ background: "#f37022" }}
-              >
-                <Plus size={14} className="mr-2" /> Criar Evento
-              </Button>
+            {profile.role === "manager" ? (
+              <>
+                <p className="font-bold">Aguardando acesso aos eventos</p>
+                <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+                  Sua conta está ativa, mas nenhum evento foi vinculado ao seu perfil ainda.
+                  Entre em contato com um administrador para obter acesso.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="font-bold">Nenhum evento cadastrado</p>
+                <Button
+                  onClick={() => setShowForm(true)}
+                  className="mt-4"
+                  style={{ background: "#f37022" }}
+                >
+                  <Plus size={14} className="mr-2" /> Criar Evento
+                </Button>
+              </>
             )}
           </CardContent>
         </Card>

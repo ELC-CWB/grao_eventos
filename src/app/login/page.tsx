@@ -54,12 +54,9 @@ export default function LoginPage() {
     }
     setLoading(true);
 
-    // Verifica se já existe algum usuário — primeiro usuário vira admin
-    const { count } = await supabase
-      .from("profiles")
-      .select("id", { count: "exact", head: true });
-
-    const isFirstUser = count === 0;
+    // Verifica server-side (service role) se é o primeiro usuário
+    const res = await fetch("/api/auth/is-first-user");
+    const { isFirstUser } = await res.json();
     const role = isFirstUser ? "admin" : "manager";
 
     const { data, error } = await supabase.auth.signUp({
@@ -89,7 +86,7 @@ export default function LoginPage() {
     if (isFirstUser) {
       toast.success("Conta de administrador criada! Bem-vindo ao Grão Eventos.");
     } else {
-      toast.success("Conta criada! Aguarde um administrador liberar seu acesso aos eventos.");
+      toast.success("Conta criada! Aguarde um administrador vincular eventos ao seu perfil.");
     }
 
     router.push("/dashboard");
@@ -296,9 +293,9 @@ export default function LoginPage() {
               <div className="rounded-xl p-3 text-xs border" style={{ background: "rgba(243,112,34,0.07)", borderColor: "rgba(243,112,34,0.2)", color: "var(--foreground)" }}>
                 <p className="font-bold mb-1" style={{ color: "#f37022" }}>Como funciona o acesso:</p>
                 <p className="text-muted-foreground leading-relaxed">
-                  O <strong>primeiro cadastro</strong> cria automaticamente uma conta de <strong>Administrador</strong>.
-                  Os próximos cadastros criam contas de <strong>Apoiador</strong>, que precisam ser habilitadas
-                  por um administrador para acessar os eventos.
+                  Novos cadastros criam uma conta de <strong>Apoiador</strong> sem acesso a eventos.
+                  Um <strong>administrador</strong> precisará vincular eventos ao seu perfil
+                  ou promovê-lo a administrador.
                 </p>
               </div>
 
