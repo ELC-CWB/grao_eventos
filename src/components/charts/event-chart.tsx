@@ -85,17 +85,17 @@ export function EventChart({ data }: EventChartProps) {
           Sem {filter === "revenue" ? "receitas" : "despesas"} registradas
         </div>
       ) : (
-        <div className="flex gap-6 items-center">
-          {/* Donut chart */}
-          <div style={{ width: 260, height: 260, flexShrink: 0 }}>
+        <div className="space-y-4">
+          {/* Donut chart — centralizado, responsivo */}
+          <div className="mx-auto" style={{ maxWidth: 260, height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+              <PieChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
                 <Pie
                   data={chartData}
                   cx="50%"
                   cy="50%"
-                  innerRadius={75}
-                  outerRadius={110}
+                  innerRadius={65}
+                  outerRadius={95}
                   paddingAngle={2}
                   dataKey="value"
                 >
@@ -108,8 +108,8 @@ export function EventChart({ data }: EventChartProps) {
             </ResponsiveContainer>
           </div>
 
-          {/* Legend with values */}
-          <div className="flex-1 space-y-2">
+          {/* Legenda — abaixo do gráfico */}
+          <div className="space-y-2">
             {chartData.map((entry) => (
               <div key={entry.name} className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">

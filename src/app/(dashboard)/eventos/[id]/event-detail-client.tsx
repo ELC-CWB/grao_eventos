@@ -562,7 +562,7 @@ export function EventDetailClient({
                       </td>
                       <td className="px-2 py-3">
                         {canEditTx(tx) && (
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity justify-end">
+                          <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity justify-end">
                             <Button variant="ghost" size="icon" className="w-6 h-6"
                               onClick={() => { setEditingTx(tx); setShowTxForm(true); }}>
                               <Edit size={11} />
@@ -586,7 +586,7 @@ export function EventDetailClient({
 
       {/* Gráfico Dialog */}
       <Dialog open={showChart} onOpenChange={setShowChart}>
-        <DialogContent style={{ maxWidth: "780px", width: "calc(100vw - 2rem)" }}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto" style={{ maxWidth: "480px", width: "calc(100vw - 2rem)" }}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileSpreadsheet size={15} style={{ color: "#f37022" }} /> Gráfico por Categoria
