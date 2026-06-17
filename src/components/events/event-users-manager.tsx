@@ -3,8 +3,9 @@
 import { useState } from "react";
 import type { Profile, EventUser } from "@/types";
 import { createClient } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Plus, Trash2, Users } from "lucide-react";
@@ -23,6 +24,7 @@ export function EventUsersManager({ eventId, eventUsers, allProfiles, onUsersCha
 
   const assignedIds = new Set(eventUsers.map((eu) => eu.user_id));
   const availableProfiles = allProfiles.filter((p) => !assignedIds.has(p.id) && p.role === "manager");
+  const selectedProfile = availableProfiles.find((p) => p.id === selectedUserId);
 
   async function handleAdd() {
     if (!selectedUserId) return;
@@ -58,17 +60,25 @@ export function EventUsersManager({ eventId, eventUsers, allProfiles, onUsersCha
       <div className="flex gap-2">
         <Select value={selectedUserId} onValueChange={(v) => setSelectedUserId(v ?? "")}>
           <SelectTrigger className="flex-1">
-            <SelectValue placeholder="Selecionar gestor..." />
+            {/* Exibe o nome do usuário selecionado manualmente — evita o UUID do base-ui */}
+            <span className={cn(
+              "flex-1 text-left text-sm truncate",
+              !selectedProfile && "text-muted-foreground"
+            )}>
+              {selectedProfile
+                ? `${selectedProfile.full_name} — ${selectedProfile.email}`
+                : "Selecionar gestor..."}
+            </span>
           </SelectTrigger>
           <SelectContent>
             {availableProfiles.length === 0 ? (
-              <div className="py-4 text-center text-sm text-muted-foreground">
+              <div className="py-4 text-center text-sm text-muted-foreground px-3">
                 Todos os gestores já foram adicionados
               </div>
             ) : (
               availableProfiles.map((p) => (
                 <SelectItem key={p.id} value={p.id}>
-                  {p.full_name} – {p.email}
+                  {p.full_name} — {p.email}
                 </SelectItem>
               ))
             )}
@@ -107,7 +117,9 @@ export function EventUsersManager({ eventId, eventUsers, allProfiles, onUsersCha
                   <p className="font-semibold text-sm">{p.full_name}</p>
                   <p className="text-xs text-muted-foreground">{p.email}</p>
                 </div>
-                <span className="text-xs text-muted-foreground font-medium capitalize">{p.role === "admin" ? "Admin" : "Gestor"}</span>
+                <span className="text-xs text-muted-foreground font-medium">
+                  {p.role === "admin" ? "Admin" : "Apoiador"}
+                </span>
                 <Button
                   variant="ghost" size="icon"
                   className="w-7 h-7 opacity-0 group-hover:opacity-100 text-destructive hover:text-destructive"

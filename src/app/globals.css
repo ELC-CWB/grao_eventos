@@ -60,16 +60,16 @@
 
   /* shadcn theme - light */
   --background: oklch(0.985 0.002 95);
-  --foreground: oklch(0.15 0.01 255);
+  --foreground: oklch(0.35 0.008 255);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.01 255);
+  --card-foreground: oklch(0.35 0.008 255);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.01 255);
+  --popover-foreground: oklch(0.35 0.008 255);
   /* Primary = Grão orange */
   --primary: oklch(0.65 0.19 45);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.96 0.003 95);
-  --secondary-foreground: oklch(0.15 0.01 255);
+  --secondary-foreground: oklch(0.35 0.008 255);
   --muted: oklch(0.96 0.003 95);
   --muted-foreground: oklch(0.55 0.005 255);
   --accent: oklch(0.97 0.01 60);
@@ -85,15 +85,15 @@
   --chart-4: oklch(0.75 0.14 320);
   --chart-5: oklch(0.65 0.16 260);
   --radius: 0.625rem;
-  /* Sidebar - dark */
-  --sidebar: oklch(0.16 0.02 255);
-  --sidebar-foreground: oklch(0.92 0.005 255);
-  --sidebar-primary: oklch(0.65 0.19 45);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.22 0.02 255);
-  --sidebar-accent-foreground: oklch(0.92 0.005 255);
-  --sidebar-border: oklch(0.25 0.015 255);
-  --sidebar-ring: oklch(0.65 0.19 45);
+  /* Sidebar - orange brand (cor exata da logomarca #F46F22) */
+  --sidebar: #F46F22;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #F46F22;
+  --sidebar-accent: #D45C1A;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255,255,255,0.18);
+  --sidebar-ring: #ffffff;
 }
 
 .dark {
@@ -120,14 +120,14 @@
   --chart-3: oklch(0.70 0.12 145);
   --chart-4: oklch(0.75 0.14 320);
   --chart-5: oklch(0.65 0.16 260);
-  --sidebar: oklch(0.11 0.015 255);
-  --sidebar-foreground: oklch(0.92 0.005 255);
-  --sidebar-primary: oklch(0.65 0.19 45);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.17 0.015 255);
-  --sidebar-accent-foreground: oklch(0.92 0.005 255);
-  --sidebar-border: oklch(1 0 0 / 8%);
-  --sidebar-ring: oklch(0.65 0.19 45);
+  --sidebar: #E06018;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #F46F22;
+  --sidebar-accent: #C05010;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255,255,255,0.15);
+  --sidebar-ring: #ffffff;
 }
 
 @layer base {
@@ -135,7 +135,8 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background;
+    color: var(--foreground);
     font-family: 'Montserrat', sans-serif;
   }
   html {
@@ -144,6 +145,10 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
+    color: var(--foreground);
+  }
+  p, span, label, a, td, th, li, input, textarea, select, button {
+    color: inherit;
   }
 }
 

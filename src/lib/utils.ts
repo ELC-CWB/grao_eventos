@@ -70,30 +70,20 @@ export function getEventStatus(start: string, end: string): "upcoming" | "ongoin
   return "ongoing";
 }
 
-export function exportToXML(data: Record<string, unknown>[], rootTag: string, itemTag: string): string {
-  const escapeXML = (str: string) =>
-    String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&apos;");
-
-  const toXML = (obj: Record<string, unknown>): string => {
-    return Object.entries(obj)
-      .map(([key, val]) => {
-        if (val === null || val === undefined) return `<${key}/>`;
-        return `<${key}>${escapeXML(String(val))}</${key}>`;
-      })
-      .join("");
+export function exportToCSV(headers: string[], rows: (string | number)[][]): string {
+  const escape = (v: string | number) => {
+    const s = String(v ?? "");
+    return s.includes(";") || s.includes('"') || s.includes("\n")
+      ? `"${s.replace(/"/g, '""')}"`
+      : s;
   };
-
-  const items = data.map((item) => `  <${itemTag}>${toXML(item)}</${itemTag}>`).join("\n");
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<${rootTag}>\n${items}\n</${rootTag}>`;
+  const lines = [headers, ...rows].map((row) => row.map(escape).join(";"));
+  // BOM (Byte Order Mark) so Excel opens UTF-8 with accents correctly
+  return "﻿" + lines.join("\r\n");
 }
 
-export function downloadXML(content: string, filename: string) {
-  const blob = new Blob([content], { type: "application/xml" });
+export function downloadCSV(content: string, filename: string) {
+  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

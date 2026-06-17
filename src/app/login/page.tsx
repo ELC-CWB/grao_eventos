@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
+import Image from "next/image";
 
 type Mode = "login" | "register";
 
@@ -108,52 +109,42 @@ export default function LoginPage() {
       {/* Left panel - branding */}
       <div
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}
+        style={{
+          backgroundImage: "url('/foto-landing.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+        }}
       >
-        <div className="absolute -top-20 -left-20 w-96 h-96 rounded-full opacity-10"
-          style={{ background: "radial-gradient(circle, #f37022, transparent)" }} />
-        <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full opacity-10"
-          style={{ background: "radial-gradient(circle, #f37022, transparent)" }} />
+        {/* Dark overlay — fades out before the orange strip at the bottom */}
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(26,26,46,0.55) 0%, rgba(15,52,96,0.45) 60%, rgba(15,52,96,0.10) 78%, transparent 85%)" }} />
 
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#f37022" }}>
-              <span className="text-white font-black text-lg">G</span>
-            </div>
-            <div>
-              <p className="text-white font-black text-xl tracking-tight">Grão</p>
-              <p className="text-white/60 text-xs font-medium -mt-1 tracking-wider uppercase">Eventos</p>
-            </div>
+        <div className="relative z-10 flex flex-col justify-between pt-2 pb-12 pl-32 pr-6 w-full">
+          <div>
+            <h2 className="text-white font-black text-4xl leading-tight">
+              Eventos <span style={{ color: "#f37022" }}>únicos</span><br />
+              em um único lugar.
+            </h2>
           </div>
 
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-white font-black text-4xl leading-tight">
-                Gestão financeira<br />
-                <span style={{ color: "#f37022" }}>inteligente</span><br />
-                para seus eventos.
-              </h2>
-              <p className="text-white/50 mt-4 text-sm leading-relaxed max-w-xs">
-                Controle receitas, despesas, fornecedores e muito mais em um único lugar.
-                Tudo para a Escola Grão Saber.
+          <div className="mb-36">
+            <div style={{
+              background: "rgba(255,255,255,0.07)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              border: "1px solid rgba(255,255,255,0.25)",
+              borderTop: "1px solid rgba(255,255,255,0.4)",
+              borderLeft: "1px solid rgba(255,255,255,0.3)",
+              borderRadius: "16px",
+              padding: "16px 20px",
+              display: "inline-block",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.2)",
+              transform: "perspective(600px) rotateX(2deg)",
+            }}>
+              <p className="font-bold text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.90)" }}>
+                Gestão financeira<br />Gestão de equipes e fornecedores<br />Todos os eventos da Grão
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { label: "Eventos", value: "Múltiplos" },
-                { label: "Controle", value: "Total" },
-                { label: "Acesso", value: "Seguro" },
-              ].map((stat) => (
-                <div key={stat.label} className="rounded-xl p-3 border border-white/10"
-                  style={{ background: "rgba(255,255,255,0.05)" }}>
-                  <p className="text-white font-bold text-lg">{stat.value}</p>
-                  <p className="text-white/40 text-xs">{stat.label}</p>
-                </div>
-              ))}
-            </div>
           </div>
-
-          <p className="text-white/20 text-xs">© 2024 Escola Grão Saber. Todos os direitos reservados.</p>
         </div>
       </div>
 
@@ -163,9 +154,7 @@ export default function LoginPage() {
 
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "#f37022" }}>
-              <span className="text-white font-black text-lg">G</span>
-            </div>
+            <Image src="/logo-grao-saber.png" alt="Grão Saber" width={72} height={72} className="rounded-xl" />
             <div>
               <p className="font-black text-xl tracking-tight">Grão Eventos</p>
               <p className="text-muted-foreground text-xs">Escola Grão Saber</p>
@@ -308,7 +297,7 @@ export default function LoginPage() {
                 <p className="font-bold mb-1" style={{ color: "#f37022" }}>Como funciona o acesso:</p>
                 <p className="text-muted-foreground leading-relaxed">
                   O <strong>primeiro cadastro</strong> cria automaticamente uma conta de <strong>Administrador</strong>.
-                  Os próximos cadastros criam contas de <strong>Gestor</strong>, que precisam ser habilitadas
+                  Os próximos cadastros criam contas de <strong>Apoiador</strong>, que precisam ser habilitadas
                   por um administrador para acessar os eventos.
                 </p>
               </div>

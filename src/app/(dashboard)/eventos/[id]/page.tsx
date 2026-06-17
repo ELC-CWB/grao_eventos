@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { redirect, notFound } from "next/navigation";
 import { EventDetailClient } from "./event-detail-client";
 
@@ -11,12 +12,17 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
   if (!profile) redirect("/login");
 
-  const { data: event } = await supabase.from("events").select("*").eq("id", id).single();
+  const admin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data: event } = await admin.from("events").select("*").eq("id", id).single();
   if (!event) notFound();
 
-  // Check access for managers
+  // Check access for managers using admin client (reliable, bypasses RLS)
   if (profile.role === "manager") {
-    const { data: access } = await supabase
+    const { data: access } = await admin
       .from("event_users")
       .select("id")
       .eq("event_id", id)
@@ -29,7 +35,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
     await Promise.all([
       supabase
         .from("transactions")
-        .select("*, category:categories(*), responsible_person:responsible_persons(*)")
+        .select("*, category:categories(*), responsible_person:responsible_persons(*), supplier:suppliers(*), created_by_profile:profiles!created_by(*)")
         .eq("event_id", id)
         .order("date", { ascending: false }),
       supabase.from("categories").select("*").eq("event_id", id).order("name"),

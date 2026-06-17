@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { Event, Profile } from "@/types";
 import { formatDateRange, getEventStatus } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -47,6 +47,7 @@ interface EventsClientProps {
 
 export function EventsClient({ profile, events: initialEvents }: EventsClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const [events, setEvents] = useState(initialEvents);
   const [search, setSearch] = useState("");
@@ -54,6 +55,15 @@ export function EventsClient({ profile, events: initialEvents }: EventsClientPro
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Abre o modal automaticamente se vier de ?novo=1
+  useEffect(() => {
+    if (searchParams.get("novo") === "1" && profile.role === "admin") {
+      setEditingEvent(null);
+      setShowForm(true);
+      router.replace("/eventos");
+    }
+  }, [searchParams, profile.role, router]);
 
   const filtered = events.filter((ev) =>
     ev.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -137,76 +147,95 @@ export function EventsClient({ profile, events: initialEvents }: EventsClientPro
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-3">
-          {filtered.map((ev, i) => {
-            const status = getEventStatus(ev.start_date, ev.end_date);
-            const statusConfig = STATUS_CONFIG[status];
-            const color = ev.color || EVENT_COLORS[i % EVENT_COLORS.length];
-
-            return (
-              <div
-                key={ev.id}
-                className="group flex items-center gap-4 p-4 rounded-2xl border bg-card card-hover"
-              >
-                {/* Color dot */}
-                <div className="flex-shrink-0 w-1.5 h-16 rounded-full" style={{ background: color }} />
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={cn("text-[11px] font-semibold px-2 py-0.5 rounded-full", statusConfig.className)}>
-                      {statusConfig.label}
-                    </span>
-                  </div>
-                  <h3 className="font-black text-base truncate">{ev.name}</h3>
-                  <p className="text-xs text-muted-foreground font-medium">
-                    {formatDateRange(ev.start_date, ev.end_date)}
-                  </p>
-                  {ev.location && (
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                      <MapPin size={10} /> {ev.location}
-                    </p>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {profile.role === "admin" && (
-                    <>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => { e.preventDefault(); setEditingEvent(ev); setShowForm(true); }}
-                      >
-                        <Edit size={14} />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
-                        onClick={(e) => { e.preventDefault(); setDeletingId(ev.id); }}
-                      >
-                        <Trash2 size={14} />
-                      </Button>
-                    </>
-                  )}
-                  <Link
-                    href={`/eventos/${ev.id}`}
-                    className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-                  >
-                    <ChevronRight size={16} />
-                  </Link>
-                </div>
-              </div>
-            );
-          })}
-
-          {filtered.length === 0 && (
+        <div className="space-y-1">
+          {filtered.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p className="font-semibold">Nenhum evento encontrado</p>
             </div>
-          )}
+          ) : (() => {
+            const sorted = [...filtered].sort((a, b) =>
+              new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
+            );
+
+            const byYear = sorted.reduce<{ year: number; events: typeof sorted }[]>((acc, ev) => {
+              const year = new Date(ev.start_date).getFullYear();
+              const group = acc.find((g) => g.year === year);
+              if (group) group.events.push(ev);
+              else acc.push({ year, events: [ev] });
+              return acc;
+            }, []);
+
+            return byYear.map(({ year, events: yearEvents }) => (
+              <div key={year} className="space-y-2">
+                {/* Year separator */}
+                <div className="flex items-center gap-3 py-2">
+                  <span className="text-sm font-black tracking-widest px-3 py-0.5 rounded-full text-white" style={{ background: "#f37022" }}>{year}</span>
+                  <div className="flex-1 h-0.5 rounded-full" style={{ background: "rgba(243,112,34,0.25)" }} />
+                </div>
+
+                <div className="grid gap-2">
+                  {yearEvents.map((ev, i) => {
+                    const status = getEventStatus(ev.start_date, ev.end_date);
+                    const statusConfig = STATUS_CONFIG[status];
+                    const color = ev.color || EVENT_COLORS[i % EVENT_COLORS.length];
+
+                    return (
+                      <div
+                        key={ev.id}
+                        className="group relative flex items-center gap-4 p-4 rounded-2xl border bg-card card-hover cursor-pointer"
+                        onClick={() => router.push(`/eventos/${ev.id}`)}
+                      >
+                        <div className="flex-shrink-0 w-1.5 h-16 rounded-full" style={{ background: color }} />
+
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-black text-base truncate">{ev.name}</h3>
+                          <p className="text-xs text-muted-foreground font-medium">
+                            {formatDateRange(ev.start_date, ev.end_date)}
+                          </p>
+                          {ev.location && (
+                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                              <MapPin size={10} /> {ev.location}
+                            </p>
+                          )}
+                        </div>
+
+                        {ev.image_url && (
+                          <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border bg-muted/30">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={ev.image_url} alt={ev.name} className="w-full h-full object-contain" />
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                          {profile.role === "admin" && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => { setEditingEvent(ev); setShowForm(true); }}
+                              >
+                                <Edit size={14} />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                                onClick={() => setDeletingId(ev.id)}
+                              >
+                                <Trash2 size={14} />
+                              </Button>
+                            </>
+                          )}
+                          <ChevronRight size={16} className="text-muted-foreground" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ));
+          })()}
         </div>
       )}
 

@@ -1,9 +1,8 @@
 "use client";
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { formatCurrency } from "@/lib/utils";
-import { BarChart2 } from "lucide-react";
 
 interface ChartDataPoint {
   name: string;
@@ -15,25 +14,24 @@ interface EventChartProps {
   data: ChartDataPoint[];
 }
 
-const CustomTooltip = ({ active, payload, label }: {
+type ChartFilter = "revenue" | "expense";
+
+const COLORS = [
+  "#f37022", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b",
+  "#06b6d4", "#ec4899", "#84cc16", "#6366f1", "#ef4444",
+];
+
+const CustomTooltip = ({ active, payload }: {
   active?: boolean;
-  payload?: { value: number; name: string; color: string }[];
-  label?: string;
+  payload?: { name: string; value: number; payload: { percent: number } }[];
 }) => {
   if (active && payload && payload.length) {
+    const { name, value, payload: p } = payload[0];
     return (
-      <div className="bg-card border border-border rounded-xl p-3 shadow-lg text-sm">
-        <p className="font-bold mb-2 text-foreground">{label}</p>
-        {payload.map((entry) => (
-          <p key={entry.name} style={{ color: entry.color }} className="font-semibold">
-            {entry.name === "revenue" ? "Receita" : "Despesa"}: {formatCurrency(entry.value)}
-          </p>
-        ))}
-        {payload.length === 2 && (
-          <p className="text-muted-foreground mt-1 pt-1 border-t border-border">
-            Resultado: {formatCurrency(payload[0].value - payload[1].value)}
-          </p>
-        )}
+      <div className="bg-card border border-border rounded-xl px-3 py-2 shadow-lg text-sm">
+        <p className="font-bold text-foreground">{name}</p>
+        <p className="font-semibold" style={{ color: "#f37022" }}>{formatCurrency(value)}</p>
+        <p className="text-muted-foreground text-xs">{(p.percent * 100).toFixed(1)}%</p>
       </div>
     );
   }
@@ -41,48 +39,99 @@ const CustomTooltip = ({ active, payload, label }: {
 };
 
 export function EventChart({ data }: EventChartProps) {
+  const [filter, setFilter] = useState<ChartFilter>("revenue");
+
+  const chartData = data
+    .map((d, i) => ({
+      name: d.name,
+      value: filter === "revenue" ? d.revenue : d.expense,
+      color: COLORS[i % COLORS.length],
+    }))
+    .filter((d) => d.value > 0);
+
   if (data.length === 0) return null;
 
+  const total = chartData.reduce((s, d) => s + d.value, 0);
+  const totalColor = filter === "revenue" ? "#10b981" : "#ef4444";
+
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2">
-          <BarChart2 size={16} style={{ color: "#f37022" }} />
-          Receitas e Despesas por Categoria
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 5, right: 10, left: 10, bottom: 5 }} barGap={4}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis
-                dataKey="name"
-                tick={{ fontSize: 11, fontFamily: "Montserrat", fontWeight: 600, fill: "var(--muted-foreground)" }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tickFormatter={(v) => `R$ ${(v / 1000).toFixed(0)}k`}
-                tick={{ fontSize: 11, fontFamily: "Montserrat", fill: "var(--muted-foreground)" }}
-                axisLine={false}
-                tickLine={false}
-                width={55}
-              />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--muted)", opacity: 0.5 }} />
-              <Legend
-                formatter={(value) => (
-                  <span style={{ fontSize: 12, fontFamily: "Montserrat", fontWeight: 600 }}>
-                    {value === "revenue" ? "Receita" : "Despesa"}
-                  </span>
-                )}
-              />
-              <Bar dataKey="revenue" fill="#10b981" radius={[4, 4, 0, 0]} name="revenue" />
-              <Bar dataKey="expense" fill="#ef4444" radius={[4, 4, 0, 0]} name="expense" />
-            </BarChart>
-          </ResponsiveContainer>
+    <div className="space-y-3">
+      {/* Filter buttons */}
+      <div className="flex gap-1">
+        <button
+          type="button"
+          onClick={() => setFilter("revenue")}
+          className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all"
+          style={filter === "revenue"
+            ? { background: "#10b981", borderColor: "#10b981", color: "white" }
+            : { borderColor: "var(--border)", color: "var(--muted-foreground)" }}
+        >
+          Receita
+        </button>
+        <button
+          type="button"
+          onClick={() => setFilter("expense")}
+          className="text-[11px] font-semibold px-2.5 py-1 rounded-lg border transition-all"
+          style={filter === "expense"
+            ? { background: "#ef4444", borderColor: "#ef4444", color: "white" }
+            : { borderColor: "var(--border)", color: "var(--muted-foreground)" }}
+        >
+          Despesa
+        </button>
+      </div>
+
+      {chartData.length === 0 ? (
+        <div className="h-48 flex items-center justify-center text-muted-foreground text-sm">
+          Sem {filter === "revenue" ? "receitas" : "despesas"} registradas
         </div>
-      </CardContent>
-    </Card>
+      ) : (
+        <div className="flex gap-6 items-center">
+          {/* Donut chart */}
+          <div style={{ width: 260, height: 260, flexShrink: 0 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+                <Pie
+                  data={chartData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={75}
+                  outerRadius={110}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {chartData.map((entry, i) => (
+                    <Cell key={i} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Legend with values */}
+          <div className="flex-1 space-y-2">
+            {chartData.map((entry) => (
+              <div key={entry.name} className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: entry.color }} />
+                  <span className="text-sm font-semibold truncate">{entry.name}</span>
+                </div>
+                <div className="text-right flex-shrink-0 flex items-center gap-2">
+                  <span className="text-[11px] text-muted-foreground">
+                    {total > 0 ? `${((entry.value / total) * 100).toFixed(1)}%` : ""}
+                  </span>
+                  <span className="text-sm font-black" style={{ color: entry.color }}>{formatCurrency(entry.value)}</span>
+                </div>
+              </div>
+            ))}
+            {/* Total */}
+            <div className="flex items-center justify-between gap-3 pt-2 border-t">
+              <span className="text-sm font-bold text-muted-foreground">Total</span>
+              <span className="text-sm font-black" style={{ color: totalColor }}>{formatCurrency(total)}</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

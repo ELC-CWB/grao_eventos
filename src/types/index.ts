@@ -21,6 +21,7 @@ export interface Event {
   status: EventStatus;
   color?: string;
   location?: string;
+  image_url?: string;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -61,6 +62,7 @@ export interface Transaction {
   amount: number;
   category_id?: string;
   responsible_person_id?: string;
+  supplier_id?: string;
   date: string;
   notes?: string;
   created_by: string;
@@ -68,16 +70,23 @@ export interface Transaction {
   updated_at: string;
   category?: Category;
   responsible_person?: ResponsiblePerson;
+  supplier?: Supplier;
   created_by_profile?: Profile;
 }
 
+export type SupplierType = "pf" | "pj";
+
 export interface Supplier {
   id: string;
+  supplier_type: SupplierType;
   name: string;
+  cnpj?: string;
+  company_name?: string;
   contact_name?: string;
   phone?: string;
   email?: string;
   category?: string;
+  item_supplied?: string;
   address?: string;
   notes?: string;
   created_by: string;

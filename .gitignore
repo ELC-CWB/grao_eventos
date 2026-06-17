@@ -33,6 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# source assets already copied to public/
+"Foto landing page.png"
+Foto landing page.png
+
 # vercel
 .vercel
 

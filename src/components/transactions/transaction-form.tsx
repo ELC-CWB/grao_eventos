@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import type { Transaction, Category, ResponsiblePerson } from "@/types";
+import type { Transaction, Category, Supplier } from "@/types";
 import { createClient } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface TransactionFormProps {
   eventId: string;
   transaction?: Transaction;
   categories: Category[];
-  responsiblePersons: ResponsiblePerson[];
+  suppliers: Supplier[];
   onSaved: (tx: Transaction) => void;
   onCancel: () => void;
 }
@@ -22,7 +23,7 @@ export function TransactionForm({
   eventId,
   transaction,
   categories,
-  responsiblePersons,
+  suppliers,
   onSaved,
   onCancel,
 }: TransactionFormProps) {
@@ -34,7 +35,7 @@ export function TransactionForm({
     amount: transaction ? String(transaction.amount) : "",
     date: transaction?.date ?? new Date().toISOString().split("T")[0],
     category_id: transaction?.category_id ?? "",
-    responsible_person_id: transaction?.responsible_person_id ?? "",
+    supplier_id: transaction?.supplier_id ?? "",
     notes: transaction?.notes ?? "",
   });
 
@@ -60,7 +61,7 @@ export function TransactionForm({
       amount,
       date: form.date,
       category_id: form.category_id || null,
-      responsible_person_id: form.responsible_person_id || null,
+      supplier_id: form.supplier_id || null,
       notes: form.notes || null,
     };
 
@@ -70,14 +71,14 @@ export function TransactionForm({
         .from("transactions")
         .update({ ...payload, updated_at: new Date().toISOString() })
         .eq("id", transaction.id)
-        .select("*, category:categories(*), responsible_person:responsible_persons(*)")
+        .select("*, category:categories(*), supplier:suppliers(*), created_by_profile:profiles!created_by(*)")
         .single();
     } else {
       const { data: { user } } = await supabase.auth.getUser();
       result = await supabase
         .from("transactions")
         .insert({ ...payload, created_by: user!.id })
-        .select("*, category:categories(*), responsible_person:responsible_persons(*)")
+        .select("*, category:categories(*), supplier:suppliers(*), created_by_profile:profiles!created_by(*)")
         .single();
     }
 
@@ -162,40 +163,49 @@ export function TransactionForm({
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <Label>Categoria</Label>
-        <Select
-          value={form.category_id}
-          onValueChange={(v) => setForm((prev) => ({ ...prev, category_id: !v || v === "none" ? "" : v }))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Selecionar categoria..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">Sem categoria</SelectItem>
-            {relevantCategories.map((c) => (
-              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-1.5">
-        <Label>Responsável</Label>
-        <Select
-          value={form.responsible_person_id}
-          onValueChange={(v) => setForm((prev) => ({ ...prev, responsible_person_id: !v || v === "none" ? "" : v }))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Selecionar responsável..." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">Sem responsável</SelectItem>
-            {responsiblePersons.map((p) => (
-              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1.5">
+          <Label>Categoria</Label>
+          <Select
+            value={form.category_id}
+            onValueChange={(v) => setForm((prev) => ({ ...prev, category_id: !v || v === "none" ? "" : v }))}
+          >
+            <SelectTrigger className="w-full">
+              <span className={cn("flex-1 text-left text-sm truncate", !form.category_id && "text-muted-foreground")}>
+                {form.category_id
+                  ? (relevantCategories.find((c) => c.id === form.category_id)?.name ?? "Sem categoria")
+                  : "Selecionar categoria..."}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Sem categoria</SelectItem>
+              {relevantCategories.map((c) => (
+                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label>Fornecedor</Label>
+          <Select
+            value={form.supplier_id}
+            onValueChange={(v) => setForm((prev) => ({ ...prev, supplier_id: !v || v === "none" ? "" : v }))}
+          >
+            <SelectTrigger className="w-full">
+              <span className={cn("flex-1 text-left text-sm truncate", !form.supplier_id && "text-muted-foreground")}>
+                {form.supplier_id
+                  ? (suppliers.find((s) => s.id === form.supplier_id)?.name ?? "Sem fornecedor")
+                  : "Selecionar fornecedor..."}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Sem fornecedor</SelectItem>
+              {suppliers.map((s) => (
+                <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="space-y-1.5">

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { DashboardClient } from "./dashboard-client";
 
@@ -16,29 +17,39 @@ export default async function DashboardPage() {
 
   if (!profile) redirect("/login");
 
-  // Fetch events based on role
-  let eventsQuery = supabase
-    .from("events")
-    .select("*")
-    .order("start_date", { ascending: true });
+  let events = null;
 
   if (profile.role === "manager") {
-    const { data: eventUsers } = await supabase
+    const admin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    const { data: eventUsers } = await admin
       .from("event_users")
       .select("event_id")
       .eq("user_id", user.id);
-    const eventIds = eventUsers?.map((eu) => eu.event_id) ?? [];
-    if (eventIds.length > 0) {
-      eventsQuery = eventsQuery.in("id", eventIds);
-    } else {
+
+    const ids = eventUsers?.map((eu: { event_id: string }) => eu.event_id) ?? [];
+    if (ids.length === 0) {
       return <DashboardClient profile={profile} events={[]} summaries={{}} />;
     }
+
+    const { data } = await admin
+      .from("events")
+      .select("*")
+      .in("id", ids)
+      .order("start_date", { ascending: true });
+    events = data;
+  } else {
+    const { data } = await supabase
+      .from("events")
+      .select("*")
+      .order("start_date", { ascending: true });
+    events = data;
   }
 
-  const { data: events } = await eventsQuery;
-
-  // Fetch transaction summaries per event
-  const eventIds = (events ?? []).map((e) => e.id);
+  const eventList = events ?? [];
+  const eventIds = eventList.map((e) => e.id);
   const summaries: Record<string, { revenue: number; expense: number }> = {};
 
   if (eventIds.length > 0) {
@@ -57,7 +68,7 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       profile={profile}
-      events={events ?? []}
+      events={eventList}
       summaries={summaries}
     />
   );

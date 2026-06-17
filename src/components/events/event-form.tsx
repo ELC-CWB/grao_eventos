@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Event } from "@/types";
 import { createClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { ImageIcon, X } from "lucide-react";
 
 const EVENT_COLORS = [
   "#f37022", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b",
@@ -21,7 +22,10 @@ interface EventFormProps {
 
 export function EventForm({ event, onSaved, onCancel }: EventFormProps) {
   const supabase = createClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(event?.image_url ?? null);
   const [form, setForm] = useState({
     name: event?.name ?? "",
     description: event?.description ?? "",
@@ -33,6 +37,29 @@ export function EventForm({ event, onSaved, onCancel }: EventFormProps) {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  }
+
+  function clearImage() {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  async function uploadImage(eventId: string): Promise<string | null> {
+    if (!imageFile) return null;
+    const ext = imageFile.name.split(".").pop();
+    const path = `${eventId}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("event-images").upload(path, imageFile, { upsert: true });
+    if (error) { toast.error("Erro ao enviar imagem"); return null; }
+    const { data } = supabase.storage.from("event-images").getPublicUrl(path);
+    return data.publicUrl;
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -50,29 +77,43 @@ export function EventForm({ event, onSaved, onCancel }: EventFormProps) {
       color: form.color,
     };
 
-    let result;
+    let savedEvent: Event | null = null;
+
     if (event) {
-      result = await supabase
+      const { data, error } = await supabase
         .from("events")
         .update({ ...payload, updated_at: new Date().toISOString() })
         .eq("id", event.id)
         .select()
         .single();
+      if (error) { toast.error("Erro ao salvar evento"); setLoading(false); return; }
+      savedEvent = data as Event;
     } else {
       const { data: { user } } = await supabase.auth.getUser();
-      result = await supabase
+      const { data, error } = await supabase
         .from("events")
         .insert({ ...payload, created_by: user!.id })
         .select()
         .single();
+      if (error) { toast.error("Erro ao criar evento"); setLoading(false); return; }
+      savedEvent = data as Event;
     }
 
-    if (result.error) {
-      toast.error("Erro ao salvar evento");
-    } else {
-      toast.success(event ? "Evento atualizado" : "Evento criado");
-      onSaved(result.data as Event);
+    // Upload image if selected
+    if (imageFile && savedEvent) {
+      const imageUrl = await uploadImage(savedEvent.id);
+      if (imageUrl) {
+        await supabase.from("events").update({ image_url: imageUrl }).eq("id", savedEvent.id);
+        savedEvent = { ...savedEvent, image_url: imageUrl };
+      }
+    } else if (!imagePreview && event?.image_url) {
+      // Image was cleared
+      await supabase.from("events").update({ image_url: null }).eq("id", savedEvent!.id);
+      savedEvent = { ...savedEvent!, image_url: undefined };
     }
+
+    toast.success(event ? "Evento atualizado" : "Evento criado");
+    onSaved(savedEvent!);
     setLoading(false);
   }
 
@@ -134,6 +175,40 @@ export function EventForm({ event, onSaved, onCancel }: EventFormProps) {
           placeholder="Descrição do evento..."
           value={form.description}
           onChange={handleChange}
+        />
+      </div>
+
+      {/* Image upload */}
+      <div className="space-y-1.5">
+        <Label>Imagem do Evento</Label>
+        {imagePreview ? (
+          <div className="relative w-full h-36 rounded-xl overflow-hidden border">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+            <button
+              type="button"
+              onClick={clearImage}
+              className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
+            >
+              <X size={12} />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full h-24 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
+          >
+            <ImageIcon size={20} />
+            <span className="text-xs font-medium">Clique para adicionar imagem</span>
+          </button>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="hidden"
         />
       </div>
 
