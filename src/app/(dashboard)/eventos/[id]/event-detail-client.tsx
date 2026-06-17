@@ -440,7 +440,7 @@ export function EventDetailClient({
               <thead>
                 <tr className="border-b" style={{ background: "rgba(0,0,0,0.02)" }}>
                   <th className="text-left px-2 py-1.5">
-                    <Select value={filterDate} onValueChange={setFilterDate}>
+                    <Select value={filterDate} onValueChange={(v) => v && setFilterDate(v)}>
                       <SelectTrigger className="h-6 border-0 shadow-none bg-transparent px-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground w-auto gap-0.5">
                         <SelectValue>{filterDate === "__all__" ? "Data" : formatDate(filterDate)}</SelectValue>
                       </SelectTrigger>
@@ -453,7 +453,7 @@ export function EventDetailClient({
                     </Select>
                   </th>
                   <th className="text-left px-2 py-1.5 hidden lg:table-cell">
-                    <Select value={filterUser} onValueChange={setFilterUser}>
+                    <Select value={filterUser} onValueChange={(v) => v && setFilterUser(v)}>
                       <SelectTrigger className="h-6 border-0 shadow-none bg-transparent px-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground w-auto gap-0.5">
                         <SelectValue>{filterUser === "__all__" ? "Usuário" : (uniqueUsers.find(u => u.id === filterUser)?.name ?? "Usuário")}</SelectValue>
                       </SelectTrigger>
@@ -466,7 +466,7 @@ export function EventDetailClient({
                     </Select>
                   </th>
                   <th className="text-left px-2 py-1.5 hidden md:table-cell">
-                    <Select value={filterCategory} onValueChange={setFilterCategory}>
+                    <Select value={filterCategory} onValueChange={(v) => v && setFilterCategory(v)}>
                       <SelectTrigger className="h-6 border-0 shadow-none bg-transparent px-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground w-auto gap-0.5">
                         <SelectValue>
                           {filterCategory === "__all__" ? "Categoria" : filterCategory === "__none__" ? "Sem categoria" : usedCategories.find(c => c.id === filterCategory)?.name ?? "Categoria"}
@@ -481,7 +481,7 @@ export function EventDetailClient({
                     </Select>
                   </th>
                   <th className="text-left px-2 py-1.5 hidden md:table-cell">
-                    <Select value={filterSupplier} onValueChange={setFilterSupplier}>
+                    <Select value={filterSupplier} onValueChange={(v) => v && setFilterSupplier(v)}>
                       <SelectTrigger className="h-6 border-0 shadow-none bg-transparent px-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground w-auto gap-0.5">
                         <SelectValue>{filterSupplier === "__all__" ? "Fornecedor" : (uniqueSuppliers.find(s => s.id === filterSupplier)?.name ?? "Fornecedor")}</SelectValue>
                       </SelectTrigger>
@@ -494,7 +494,7 @@ export function EventDetailClient({
                     </Select>
                   </th>
                   <th className="text-left px-2 py-1.5">
-                    <Select value={filterDesc} onValueChange={setFilterDesc}>
+                    <Select value={filterDesc} onValueChange={(v) => v && setFilterDesc(v)}>
                       <SelectTrigger className="h-6 border-0 shadow-none bg-transparent px-1 text-[10px] font-semibold text-muted-foreground hover:text-foreground w-auto gap-0.5 max-w-[200px]">
                         <SelectValue>{filterDesc === "__all__" ? "Descrição" : filterDesc}</SelectValue>
                       </SelectTrigger>
@@ -665,7 +665,7 @@ export function EventDetailClient({
                 <div className="space-y-1.5 pt-2 border-t">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Vincular usuário existente</p>
                   <div className="flex gap-2">
-                    <Select value={linkProfileId} onValueChange={setLinkProfileId}>
+                    <Select value={linkProfileId} onValueChange={(v) => v && setLinkProfileId(v)}>
                       <SelectTrigger className="flex-1 h-9 text-sm">
                         <SelectValue>{linkProfileId ? allProfiles.find(p => p.id === linkProfileId)?.full_name : "Selecionar usuário..."}</SelectValue>
                       </SelectTrigger>

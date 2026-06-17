@@ -282,7 +282,7 @@ export function DashboardClient({ profile, events, summaries }: DashboardClientP
 
           {/* Year filter */}
           {availableYears.length > 0 && (
-            <Select value={filterYear} onValueChange={setFilterYear}>
+            <Select value={filterYear} onValueChange={(v) => v && setFilterYear(v)}>
               <SelectTrigger
                 className="h-9 min-w-[110px] font-black text-sm border-2 rounded-xl"
                 style={{ borderColor: "#f37022", color: "#f37022", background: "rgba(243,112,34,0.07)" }}

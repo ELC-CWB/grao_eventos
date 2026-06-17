@@ -215,7 +215,7 @@ function openCreate() {
                 <tr className="border-b" style={{ background: "rgba(243,112,34,0.06)" }}>
                   {/* Nome */}
                   <th className="px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                    <Select value={filterName} onValueChange={setFilterName}>
+                    <Select value={filterName} onValueChange={(v) => v && setFilterName(v)}>
                       <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
                         <SelectValue>{filterName === "__all__" ? "Nome" : filterName}</SelectValue>
                       </SelectTrigger>
@@ -227,7 +227,7 @@ function openCreate() {
                   </th>
                   {/* Contato */}
                   <th className="px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                    <Select value={filterContact} onValueChange={setFilterContact}>
+                    <Select value={filterContact} onValueChange={(v) => v && setFilterContact(v)}>
                       <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
                         <SelectValue>{filterContact === "__all__" ? "Contato" : filterContact}</SelectValue>
                       </SelectTrigger>
@@ -239,7 +239,7 @@ function openCreate() {
                   </th>
                   {/* Telefone */}
                   <th className="px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                    <Select value={filterPhone} onValueChange={setFilterPhone}>
+                    <Select value={filterPhone} onValueChange={(v) => v && setFilterPhone(v)}>
                       <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
                         <SelectValue>{filterPhone === "__all__" ? "Telefone" : filterPhone}</SelectValue>
                       </SelectTrigger>
@@ -251,7 +251,7 @@ function openCreate() {
                   </th>
                   {/* Item Fornecido */}
                   <th className="px-4 py-2.5 text-left font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                    <Select value={filterItem} onValueChange={setFilterItem}>
+                    <Select value={filterItem} onValueChange={(v) => v && setFilterItem(v)}>
                       <SelectTrigger className="h-7 border-0 bg-transparent px-0 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-none focus:ring-0 w-auto gap-1">
                         <SelectValue>{filterItem === "__all__" ? "Item Fornecido" : filterItem}</SelectValue>
                       </SelectTrigger>
