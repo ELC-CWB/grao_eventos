@@ -202,7 +202,11 @@ export function UsersClient({ currentProfile, profiles: initialProfiles, events,
               .filter(Boolean) as string[];
 
             return (
-              <div key={p.id} className="group flex items-start gap-3 p-4 rounded-2xl border bg-card card-hover">
+              <div
+                key={p.id}
+                className="group flex items-start gap-3 p-4 rounded-2xl border bg-card card-hover cursor-pointer"
+                onClick={() => openEdit(p)}
+              >
                 <Avatar className="w-10 h-10 flex-shrink-0 mt-0.5">
                   <AvatarFallback className="text-sm font-bold text-white" style={{ background: "#f37022" }}>
                     {initials}
@@ -243,16 +247,10 @@ export function UsersClient({ currentProfile, profiles: initialProfiles, events,
                     </div>
                   )}
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                  <Button variant="ghost" size="icon" className="w-7 h-7" onClick={() => openEdit(p)}>
+                <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                  <Button variant="ghost" size="icon" className="w-7 h-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => openEdit(p)}>
                     <Edit size={12} />
                   </Button>
-                  {!isCurrentUser && (
-                    <Button variant="ghost" size="icon" className="w-7 h-7 text-destructive hover:text-destructive"
-                      onClick={() => setDeletingId(p.id)}>
-                      <Trash2 size={12} />
-                    </Button>
-                  )}
                 </div>
               </div>
             );
@@ -384,6 +382,17 @@ export function UsersClient({ currentProfile, profiles: initialProfiles, events,
                 {loading ? "Salvando..." : editingProfile ? "Salvar" : "Criar Usuário"}
               </Button>
             </div>
+            {editingProfile && editingProfile.id !== currentProfile.id && (
+              <div className="flex justify-center pt-1">
+                <button
+                  type="button"
+                  className="text-xs text-destructive hover:underline"
+                  onClick={() => { setShowForm(false); setDeletingId(editingProfile.id); }}
+                >
+                  Excluir usuário
+                </button>
+              </div>
+            )}
           </form>
         </DialogContent>
       </Dialog>

@@ -12,10 +12,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
   if (!profile) redirect("/login");
 
-  const admin = createAdminClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceKey) notFound();
+
+  const admin = createAdminClient(supabaseUrl, serviceKey);
 
   const { data: event } = await admin.from("events").select("*").eq("id", id).single();
   if (!event) notFound();

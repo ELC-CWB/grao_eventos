@@ -530,18 +530,18 @@ export function DashboardClient({ profile, events, summaries }: DashboardClientP
                                 <p className="text-xs text-muted-foreground font-medium mb-4">
                                   {formatDateRange(ev.start_date, ev.end_date)}
                                 </p>
-                                <div className="grid grid-cols-3 gap-2 pt-3 border-t border-border/50">
+                                <div className="grid grid-cols-3 gap-1 pt-3 border-t border-border/50">
                                   <div>
-                                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Receita</p>
-                                    <p className="text-sm font-bold text-emerald-600">{formatCurrency(summary.revenue)}</p>
+                                    <p className="text-[9px] text-muted-foreground font-medium uppercase">Receita</p>
+                                    <p className="text-[11px] font-bold text-emerald-600 leading-tight">{formatCurrency(summary.revenue)}</p>
                                   </div>
                                   <div>
-                                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Despesa</p>
-                                    <p className="text-sm font-bold text-red-500">{formatCurrency(summary.expense)}</p>
+                                    <p className="text-[9px] text-muted-foreground font-medium uppercase">Despesa</p>
+                                    <p className="text-[11px] font-bold text-red-500 leading-tight">{formatCurrency(summary.expense)}</p>
                                   </div>
                                   <div>
-                                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Lucro</p>
-                                    <p className={cn("text-sm font-bold", profit >= 0 ? "text-emerald-600" : "text-red-500")}>
+                                    <p className="text-[9px] text-muted-foreground font-medium uppercase">Lucro</p>
+                                    <p className={cn("text-[11px] font-bold leading-tight", profit >= 0 ? "text-emerald-600" : "text-red-500")}>
                                       {formatCurrency(profit)}
                                     </p>
                                   </div>

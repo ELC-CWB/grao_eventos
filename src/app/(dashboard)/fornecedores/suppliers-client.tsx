@@ -208,9 +208,9 @@ function openCreate() {
           </CardContent>
         </Card>
       ) : (
-        <div className="rounded-2xl border overflow-hidden">
+        <div className="rounded-2xl border overflow-hidden max-w-full">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[560px] text-sm">
               <thead>
                 <tr className="border-b" style={{ background: "rgba(243,112,34,0.06)" }}>
                   {/* Nome */}
@@ -299,7 +299,7 @@ function openCreate() {
 
       {/* Form Dialog */}
       <Dialog open={showForm} onOpenChange={(open) => { setShowForm(open); if (!open) setEditingSupplier(null); }}>
-        <DialogContent style={{ maxWidth: "900px", width: "calc(100vw - 2rem)" }}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto" style={{ maxWidth: "min(900px, calc(100vw - 1rem))", width: "100%" }}>
           <DialogHeader>
             <DialogTitle>{editingSupplier ? "Editar Fornecedor" : "Novo Fornecedor"}</DialogTitle>
           </DialogHeader>

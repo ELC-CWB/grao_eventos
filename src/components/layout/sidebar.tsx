@@ -16,6 +16,7 @@ import {
   X,
   ChevronRight,
   ChevronDown,
+  ArrowLeft,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -245,14 +246,24 @@ export function Sidebar({ profile }: SidebarProps) {
 
       {/* Mobile header */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-4 border-b"
+        className="lg:hidden fixed top-0 left-0 right-0 z-[200] h-14 flex items-center justify-between px-4 border-b"
         style={{ background: "var(--sidebar)", borderColor: "var(--sidebar-border)" }}
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5">
+          {pathname !== "/dashboard" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white w-8 h-8 flex-shrink-0"
+              onClick={() => router.back()}
+            >
+              <ArrowLeft size={18} />
+            </Button>
+          )}
           <img
             src="/logo-grao-saber.png"
             alt="Logo Grão Saber"
-            className="w-10 h-10 rounded-xl object-cover flex-shrink-0"
+            className="w-9 h-9 rounded-xl object-cover flex-shrink-0"
           />
           <span className="text-white font-black text-base">Grão Saber</span>
         </div>
@@ -260,7 +271,7 @@ export function Sidebar({ profile }: SidebarProps) {
           variant="ghost"
           size="icon"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="text-white"
+          className="text-white flex-shrink-0"
         >
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
         </Button>
@@ -268,7 +279,7 @@ export function Sidebar({ profile }: SidebarProps) {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-40">
+        <div className="lg:hidden fixed inset-0 z-[200]">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
