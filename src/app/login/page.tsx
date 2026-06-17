@@ -54,44 +54,58 @@ export default function LoginPage() {
     }
     setLoading(true);
 
-    // Verifica server-side (service role) se é o primeiro usuário
-    const res = await fetch("/api/auth/is-first-user");
-    const { isFirstUser } = await res.json();
-    const role = isFirstUser ? "admin" : "manager";
+    try {
+      // Verifica server-side (auth.users via service role) se é o primeiro usuário
+      let isFirstUser = false;
+      try {
+        const res = await fetch("/api/auth/is-first-user");
+        if (res.ok) {
+          const data = await res.json();
+          isFirstUser = data.isFirstUser === true;
+        }
+      } catch {
+        // Se a verificação falhar, padrão seguro: apoiador
+        isFirstUser = false;
+      }
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, role },
-      },
-    });
+      const role = isFirstUser ? "admin" : "manager";
 
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-      return;
-    }
-
-    // Upsert profile manualmente (garante que o trigger criou corretamente)
-    if (data.user) {
-      await supabase.from("profiles").upsert({
-        id: data.user.id,
+      const { data, error } = await supabase.auth.signUp({
         email,
-        full_name: fullName,
-        role,
+        password,
+        options: {
+          data: { full_name: fullName, role },
+        },
       });
-    }
 
-    if (isFirstUser) {
-      toast.success("Conta de administrador criada! Bem-vindo ao Grão Eventos.");
-    } else {
-      toast.success("Conta criada! Aguarde um administrador vincular eventos ao seu perfil.");
-    }
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
 
-    router.push("/dashboard");
-    router.refresh();
-    setLoading(false);
+      // Upsert profile manualmente (garante que o trigger criou corretamente)
+      if (data.user) {
+        await supabase.from("profiles").upsert({
+          id: data.user.id,
+          email,
+          full_name: fullName,
+          role,
+        });
+      }
+
+      if (isFirstUser) {
+        toast.success("Conta de administrador criada! Bem-vindo ao Grão Eventos.");
+      } else {
+        toast.success("Conta criada! Aguarde um administrador vincular eventos ao seu perfil.");
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      toast.error("Ocorreu um erro ao criar a conta. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   function switchMode(m: Mode) {
