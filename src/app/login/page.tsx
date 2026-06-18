@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
+import { Eye, EyeOff, LogIn, UserPlus, Mail, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 
-type Mode = "login" | "register";
+type Mode = "login" | "register" | "forgot";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,6 +24,7 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -105,11 +106,30 @@ export default function LoginPage() {
     }
   }
 
+  async function handleForgot(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const redirectTo = `${window.location.origin}/auth/callback?next=/reset-senha`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        setForgotSent(true);
+      }
+    } catch {
+      toast.error("Ocorreu um erro. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function switchMode(m: Mode) {
     setMode(m);
     setEmail("");
     setPassword("");
     setFullName("");
+    setForgotSent(false);
   }
 
   return (
@@ -168,33 +188,48 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Mode toggle */}
-          <div className="flex rounded-xl p-1 mb-8 bg-secondary/60">
-            {(["login", "register"] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => switchMode(m)}
-                className="flex-1 py-2 rounded-lg text-sm font-bold transition-all"
-                style={
-                  mode === m
-                    ? { background: "#f37022", color: "white" }
-                    : { color: "var(--muted-foreground)" }
-                }
-              >
-                {m === "login" ? "Entrar" : "Criar conta"}
-              </button>
-            ))}
-          </div>
+          {/* Mode toggle — hidden in forgot mode */}
+          {mode !== "forgot" && (
+            <div className="flex rounded-xl p-1 mb-8 bg-secondary/60">
+              {(["login", "register"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => switchMode(m)}
+                  className="flex-1 py-2 rounded-lg text-sm font-bold transition-all"
+                  style={
+                    mode === m
+                      ? { background: "#f37022", color: "white" }
+                      : { color: "var(--muted-foreground)" }
+                  }
+                >
+                  {m === "login" ? "Entrar" : "Criar conta"}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Forgot mode — back button */}
+          {mode === "forgot" && (
+            <button
+              onClick={() => switchMode("login")}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold mb-8 hover:underline"
+              style={{ color: "#f37022" }}
+            >
+              <ArrowLeft size={15} /> Voltar para login
+            </button>
+          )}
 
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-3xl font-black text-foreground">
-              {mode === "login" ? "Bem-vindo de volta" : "Criar sua conta"}
+              {mode === "login" && "Bem-vindo de volta"}
+              {mode === "register" && "Criar sua conta"}
+              {mode === "forgot" && "Esqueci minha senha"}
             </h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              {mode === "login"
-                ? "Acesse o painel de gestão de eventos"
-                : "Preencha os dados abaixo para se cadastrar"}
+              {mode === "login" && "Acesse o painel de gestão de eventos"}
+              {mode === "register" && "Preencha os dados abaixo para se cadastrar"}
+              {mode === "forgot" && "Informe seu e-mail para receber o link de redefinição"}
             </p>
           </div>
 
@@ -216,13 +251,14 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-sm font-semibold">Senha</Label>
-                  <a
-                    href="/esqueci-senha"
+                  <button
+                    type="button"
+                    onClick={() => switchMode("forgot")}
                     className="text-xs font-semibold hover:underline"
                     style={{ color: "#f37022" }}
                   >
                     Esqueci minha senha
-                  </a>
+                  </button>
                 </div>
                 <div className="relative">
                   <Input
@@ -330,6 +366,52 @@ export default function LoginPage() {
                 </button>
               </p>
             </form>
+          )}
+
+          {/* Forgot password form */}
+          {mode === "forgot" && (
+            <div>
+              {forgotSent ? (
+                <div className="rounded-2xl p-6 text-center border" style={{ background: "rgba(243,112,34,0.06)", borderColor: "rgba(243,112,34,0.2)" }}>
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "rgba(243,112,34,0.12)" }}>
+                    <Mail size={22} style={{ color: "#f37022" }} />
+                  </div>
+                  <p className="font-black text-lg mb-1">E-mail enviado!</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Verifique a caixa de entrada de <strong>{email}</strong> e clique no link para redefinir sua senha.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => switchMode("login")}
+                    className="mt-5 text-sm font-bold hover:underline"
+                    style={{ color: "#f37022" }}
+                  >
+                    Voltar para login
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgot} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="forgot-email" className="text-sm font-semibold">E-mail cadastrado</Label>
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-11 bg-secondary/50 border-border/50"
+                    />
+                  </div>
+                  <Button type="submit" disabled={loading} className="w-full h-11 font-bold text-base" style={{ background: "#f37022" }}>
+                    {loading
+                      ? <span className="flex items-center gap-2"><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Enviando...</span>
+                      : <span className="flex items-center gap-2"><Mail size={16} />Enviar link de redefinição</span>
+                    }
+                  </Button>
+                </form>
+              )}
+            </div>
           )}
 
         </div>
