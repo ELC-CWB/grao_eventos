@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
@@ -16,20 +18,25 @@ export default function EsqueciSenhaPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setErrorMsg("");
     setLoading(true);
     try {
       const redirectTo = `${window.location.origin}/auth/callback?next=/reset-senha`;
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
       if (error) {
+        setErrorMsg(error.message);
         toast.error(error.message);
       } else {
         setSent(true);
       }
-    } catch {
-      toast.error("Ocorreu um erro. Tente novamente.");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Ocorreu um erro. Tente novamente.";
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -96,6 +103,13 @@ export default function EsqueciSenhaPage() {
                   autoFocus
                 />
               </div>
+
+              {errorMsg && (
+                <div className="rounded-xl p-3 text-sm border border-red-300 bg-red-50 text-red-700">
+                  {errorMsg}
+                </div>
+              )}
+
               <Button
                 type="submit"
                 disabled={loading}
