@@ -3,7 +3,6 @@
 export const dynamic = "force-dynamic";
 
 import { useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,13 +54,13 @@ export default function EsqueciSenhaPage() {
           </div>
         </div>
 
-        <Link
+        <a
           href="/login"
           className="inline-flex items-center gap-1.5 text-sm font-semibold mb-8 hover:underline"
           style={{ color: "#f37022" }}
         >
           <ArrowLeft size={15} /> Voltar para login
-        </Link>
+        </a>
 
         {sent ? (
           <div className="rounded-2xl p-6 text-center border" style={{ background: "rgba(243,112,34,0.06)", borderColor: "rgba(243,112,34,0.2)" }}>
@@ -72,13 +71,13 @@ export default function EsqueciSenhaPage() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               Verifique a caixa de entrada de <strong>{email}</strong> e clique no link para redefinir sua senha.
             </p>
-            <Link
+            <a
               href="/login"
               className="mt-5 inline-block text-sm font-bold hover:underline"
               style={{ color: "#f37022" }}
             >
               Voltar para login
-            </Link>
+            </a>
           </div>
         ) : (
           <>
