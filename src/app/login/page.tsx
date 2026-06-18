@@ -4,7 +4,6 @@ export const dynamic = "force-dynamic";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +25,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
 
@@ -43,7 +42,7 @@ export default function LoginPage() {
     setLoading(false);
   }
 
-  async function handleRegister(e: React.FormEvent<HTMLFormElement>) {
+  async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     if (!fullName.trim()) {
       toast.error("Informe seu nome completo.");
@@ -72,7 +71,9 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName, role } },
+        options: {
+          data: { full_name: fullName, role },
+        },
       });
 
       if (error) {
@@ -89,11 +90,11 @@ export default function LoginPage() {
         });
       }
 
-      toast.success(
-        isFirstUser
-          ? "Conta de administrador criada! Bem-vindo ao Grão Eventos."
-          : "Conta criada! Aguarde um administrador vincular eventos ao seu perfil."
-      );
+      if (isFirstUser) {
+        toast.success("Conta de administrador criada! Bem-vindo ao Grão Eventos.");
+      } else {
+        toast.success("Conta criada! Aguarde um administrador vincular eventos ao seu perfil.");
+      }
 
       router.push("/dashboard");
       router.refresh();
@@ -172,7 +173,6 @@ export default function LoginPage() {
             {(["login", "register"] as const).map((m) => (
               <button
                 key={m}
-                type="button"
                 onClick={() => switchMode(m)}
                 className="flex-1 py-2 rounded-lg text-sm font-bold transition-all"
                 style={
@@ -216,13 +216,13 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-sm font-semibold">Senha</Label>
-                  <Link
+                  <a
                     href="/esqueci-senha"
                     className="text-xs font-semibold hover:underline"
                     style={{ color: "#f37022" }}
                   >
                     Esqueci minha senha
-                  </Link>
+                  </a>
                 </div>
                 <div className="relative">
                   <Input
